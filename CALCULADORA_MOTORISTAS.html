@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadoras para Motoristas de App</title>
+<style>
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #5b2cff, #009dff);
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        text-align: center;
+        color: white;
+        padding: 30px 10px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    button.toggle-btn {
+        width: 100%;
+        background: linear-gradient(90deg, #6a0dad, #009dff);
+        color: white;
+        font-size: 1rem;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-bottom: 15px;
+        transition: background 0.3s;
+    }
+
+    button.toggle-btn:hover {
+        background: linear-gradient(90deg, #7a2cff, #00b7ff);
+    }
+
+    .calculadora {
+        display: none;
+        margin-top: 10px;
+        border-top: 2px solid #eee;
+        padding-top: 15px;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+        font-weight: 600;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    button.calcular-btn {
+        margin-top: 15px;
+        background: linear-gradient(90deg, #5b2cff, #009dff);
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    button.calcular-btn:hover {
+        background: linear-gradient(90deg, #6e35ff, #00b4ff);
+    }
+
+    .resultado {
+        margin-top: 15px;
+        background: #f8f8ff;
+        border-radius: 6px;
+        padding: 10px;
+        font-weight: 500;
+    }
+
+    #resumo {
+        margin-top: 25px;
+        padding: 15px;
+        background: #f8f8ff;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        font-size: 0.95rem;
+        white-space: pre-wrap;
+    }
+
+    #copiarResumo {
+        margin-top: 10px;
+        background: linear-gradient(90deg, #6a0dad, #009dff);
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    #copiarResumo:hover {
+        background: linear-gradient(90deg, #7a2cff, #00b7ff);
+    }
+
+    canvas {
+        width: 100%;
+        height: 200px;
+        margin-top: 15px;
+    }
+
+    footer {
+        text-align: center;
+        color: white;
+        font-size: 0.85rem;
+        padding: 15px;
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>Calculadoras para Motoristas de Aplicativo</h1>
+    <p>Ferramentas práticas para otimizar seus ganhos</p>
+</header>
+
+<div class="container">
+
+    <button class="toggle-btn" onclick="toggleCalc('calc1')">🚗 Calculadora de Lucro Diário + Combustível</button>
+    <div id="calc1" class="calculadora">
+        <label>Ganhos do dia (R$): <input type="number" id="ganhosDia" step="0.01"></label>
+        <label>KM rodados: <input type="number" id="kmRodados"></label>
+        <label>Consumo médio (km/l): <input type="number" id="consumoMedio" value="12.8" step="0.1"></label>
+        <label>Preço do combustível (R$/L): <input type="number" id="precoCombustivel" value="6" step="0.01"></label>
+
+        <button class="calcular-btn" onclick="calcularLucro()">Calcular</button>
+        <div id="resultado1" class="resultado"></div>
+        <canvas id="grafico1"></canvas>
+    </div>
+
+    <button class="toggle-btn" onclick="toggleCalc('calc2')">🛣️ Calculadora de Quilometragem e Custo</button>
+    <div id="calc2" class="calculadora">
+        <label>Quilometragem Inicial: <input type="number" id="kmInicial"></label>
+        <label>Quilometragem Final: <input type="number" id="kmFinal"></label>
+        <label>Consumo médio (km/l): <input type="number" id="consumoMedio2" value="12.8" step="0.1"></label>
+        <label>Preço do combustível (R$/L): <input type="number" id="precoCombustivel2" value="6" step="0.01"></label>
+
+        <button class="calcular-btn" onclick="calcularKmCusto()">Calcular</button>
+        <div id="resultado2" class="resultado"></div>
+        <canvas id="grafico2"></canvas>
+    </div>
+
+    <button class="toggle-btn" onclick="toggleCalc('calc3')">⛽ Calculadora de Custo por Distância</button>
+    <div id="calc3" class="calculadora">
+        <label>Quantos KM deseja rodar?: <input type="number" id="kmDesejado"></label>
+        <label>Consumo médio (km/l): <input type="number" id="consumoMedio3" value="12.8" step="0.1"></label>
+        <label>Preço do combustível (R$/L): <input type="number" id="precoCombustivel3" value="6" step="0.01"></label>
+
+        <button class="calcular-btn" onclick="calcularCustoDistancia()">Calcular</button>
+        <div id="resultado3" class="resultado"></div>
+        <canvas id="grafico3"></canvas>
+    </div>
+
+    <div id="resumo"></div>
+    <button id="copiarResumo" style="display:none;" onclick="copiarResumo()">Copiar resumo</button>
+</div>
+
+<footer>© 2025 - Calculadoras LM Cell | Desenvolvido para motoristas de app</footer>
+
+<script>
+function toggleCalc(id) {
+    const el = document.getElementById(id);
+    el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+
+function formatar(valor) {
+    return 'R$ ' + valor.toFixed(2).replace('.', ',');
+}
+
+let resumoTexto = '';
+
+function atualizarResumo() {
+    const resumoDiv = document.getElementById('resumo');
+    const botaoCopiar = document.getElementById('copiarResumo');
+    if (resumoTexto.trim() === '') {
+        resumoDiv.innerHTML = '';
+        botaoCopiar.style.display = 'none';
+        return;
+    }
+    resumoDiv.textContent = resumoTexto.trim();
+    botaoCopiar.style.display = 'block';
+}
+
+function copiarResumo() {
+    navigator.clipboard.writeText(resumoTexto.trim());
+    alert('Resumo copiado com sucesso!');
+}
+
+function desenharGrafico(canvasId, dados, cores, labels, unidades) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const largura = canvas.width = canvas.offsetWidth;
+    const altura = canvas.height = 200;
+    const max = Math.max(...dados, 1);
+    const barWidth = largura / (dados.length * 2);
+    ctx.clearRect(0, 0, largura, altura);
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+
+    dados.forEach((valor, i) => {
+        const barHeight = (valor / max) * (altura - 40);
+        const x = (i * barWidth * 2) + barWidth / 2;
+        const y = altura - barHeight - 20;
+        ctx.fillStyle = cores[i];
+        ctx.fillRect(x, y, barWidth, barHeight);
+        ctx.fillStyle = "#333";
+        ctx.fillText(labels[i], x + barWidth / 2, altura - 5);
+        const unidade = (unidades && unidades[i]) ? unidades[i] : 'R$';
+        const valorTexto = (unidade === 'R$') 
+            ? 'R$' + valor.toFixed(2).replace('.', ',')
+            : valor.toFixed(2).replace('.', ',') + ' ' + unidade;
+        ctx.fillText(valorTexto, x + barWidth / 2, y - 5);
+    });
+}
+
+function calcularLucro() {
+    const ganhos = parseFloat(document.getElementById('ganhosDia').value) || 0;
+    const km = parseFloat(document.getElementById('kmRodados').value) || 0;
+    const consumo = parseFloat(document.getElementById('consumoMedio').value) || 12.8;
+    const preco = parseFloat(document.getElementById('precoCombustivel').value) || 6;
+    if (!ganhos || !km) return;
+    const litrosGastos = km / consumo;
+    const gastoCombustivel = litrosGastos * preco;
+    const lucroLiquido = ganhos - gastoCombustivel;
+    const ganhoKm = ganhos / km;
+    document.getElementById('resultado1').innerHTML = `
+        💰 <strong>Lucro líquido:</strong> ${formatar(lucroLiquido)}<br>
+        ⛽ <strong>Gasto com combustível:</strong> ${formatar(gastoCombustivel)}<br>
+        🧮 <strong>Litros gastos:</strong> ${litrosGastos.toFixed(2)} L<br>
+        📏 <strong>Ganho por km:</strong> ${formatar(ganhoKm)}
+    `;
+    desenharGrafico("grafico1", [lucroLiquido, gastoCombustivel], ["#6a0dad", "#009dff"], ["Lucro", "Combustível"], ['R$', 'R$']);
+    resumoTexto += `🚗 *Lucro Diário:*\nLucro líquido: ${formatar(lucroLiquido)}\nGasto com combustível: ${formatar(gastoCombustivel)}\nLitros: ${litrosGastos.toFixed(2)} L\nGanho por km: ${formatar(ganhoKm)}\n\n`;
+    atualizarResumo();
+}
+
+function calcularKmCusto() {
+    const kmIni = parseFloat(document.getElementById('kmInicial').value) || 0;
+    const kmFin = parseFloat(document.getElementById('kmFinal').value) || 0;
+    if (!kmIni || !kmFin) return;
+    const consumo = parseFloat(document.getElementById('consumoMedio2').value) || 12.8;
+    const preco = parseFloat(document.getElementById('precoCombustivel2').value) || 6;
+    const kmRodados = kmFin - kmIni;
+    const litrosGastos = kmRodados / consumo;
+    const gastoCombustivel = litrosGastos * preco;
+    document.getElementById('resultado2').innerHTML = `
+        🛣️ <strong>Quilômetros rodados:</strong> ${kmRodados.toFixed(1)} km<br>
+        🧮 <strong>Litros gastos:</strong> ${litrosGastos.toFixed(2)} L<br>
+        ⛽ <strong>Gasto com combustível:</strong> ${formatar(gastoCombustivel)}
+    `;
+    desenharGrafico("grafico2", [gastoCombustivel, litrosGastos], ["#009dff", "#6a0dad"], ["Gasto", "Litros"], ['R$', 'L']);
+    resumoTexto += `🛣️ *Cálculo de Quilometragem:*\nRodados: ${kmRodados.toFixed(1)} km\nLitros gastos: ${litrosGastos.toFixed(2)} L\nGasto total: ${formatar(gastoCombustivel)}\n\n`;
+    atualizarResumo();
+}
+
+function calcularCustoDistancia() {
+    const km = parseFloat(document.getElementById('kmDesejado').value) || 0;
+    if (!km) return;
+    const consumo = parseFloat(document.getElementById('consumoMedio3').value) || 12.8;
+    const preco = parseFloat(document.getElementById('precoCombustivel3').value) || 6;
+    const litrosNecessarios = km / consumo;
+    const custoTotal = litrosNecessarios * preco;
+    document.getElementById('resultado3').innerHTML = `
+        Para rodar <strong>${km.toFixed(1)} km</strong>, você precisará de:<br>
+        🧮 <strong>Litros necessários:</strong> ${litrosNecessarios.toFixed(2)} L<br>
+        💰 <strong>Custo total:</strong> ${formatar(custoTotal)}
+    `;
+    desenharGrafico("grafico3", [custoTotal, litrosNecessarios], ["#6a0dad", "#009dff"], ["Custo", "Litros"], ['R$', 'L']);
+    resumoTexto += `⛽ *Custo por Distância:*\nDistância: ${km.toFixed(1)} km\nLitros necessários: ${litrosNecessarios.toFixed(2)} L\nCusto total: ${formatar(custoTotal)}\n\n`;
+    atualizarResumo();
+}
+</script>
+</body>
+</html>
