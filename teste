@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadoras para Motoristas de App</title>
+<style>
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #5b2cff, #009dff);
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        text-align: center;
+        color: white;
+        padding: 30px 10px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    button.toggle-btn {
+        width: 100%;
+        background: linear-gradient(90deg, #6a0dad, #009dff);
+        color: white;
+        font-size: 1rem;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-bottom: 15px;
+        transition: background 0.3s;
+    }
+
+    button.toggle-btn:hover {
+        background: linear-gradient(90deg, #7a2cff, #00b7ff);
+    }
+
+    .calculadora {
+        display: none;
+        margin-top: 10px;
+        border-top: 2px solid #eee;
+        padding-top: 15px;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+        font-weight: 600;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    button.calcular-btn {
+        margin-top: 15px;
+        background: linear-gradient(90deg, #5b2cff, #009dff);
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    button.calcular-btn:hover {
+        background: linear-gradient(90deg, #6e35ff, #00b4ff);
+    }
+
+    .resultado {
+        margin-top: 15px;
+        background: #f8f8ff;
+        border-radius: 6px;
+        padding: 10px;
+        font-weight: 500;
+    }
+
+    canvas {
+        width: 100%;
+        height: 200px;
+        margin-top: 15px;
+    }
+
+    footer {
+        text-align: center;
+        color: white;
+        font-size: 0.85rem;
+        padding: 15px;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 15px;
+        }
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>Calculadoras para Motoristas de Aplicativo</h1>
+    <p>Ferramentas práticas para otimizar seus ganhos</p>
+</header>
+
+<div class="container">
+
+    <!-- CALCULADORA 1 -->
+    <button class="toggle-btn" onclick="toggleCalc('calc1')">🚗 Calculadora de Lucro Diário + Combustível</button>
+    <div id="calc1" class="calculadora">
+        <label>Ganhos do dia (R$): <input type="number" id="ganhosDia" step="0.01"></label>
+        <label>KM rodados: <input type="number" id="kmRodados"></label>
+        <label>Horas trabalhadas: <input type="number" id="horasTrabalhadas"></label>
+        <label>Consumo médio (km/l): <input type="number" id="consumoMedio" value="12.8" step="0.1"></label>
+        <label>Preço do combustível (R$/L): <input type="number" id="precoCombustivel" value="6" step="0.01"></label>
+        <label>Aluguel diário do carro (R$): <input type="number" id="aluguelCarro" step="0.01"></label>
+
+        <button class="calcular-btn" onclick="calcularLucro()">Calcular</button>
+
+        <div id="resultado1" class="resultado"></div>
+        <canvas id="grafico1"></canvas>
+    </div>
+
+    <!-- CALCULADORA 2 -->
+    <button class="toggle-btn" onclick="toggleCalc('calc2')">⏱️ Calculadora de Média de Lucro por Hora</button>
+    <div id="calc2" class="calculadora">
+        <label>Ganhos totais (R$): <input type="number" id="ganhosTotais" step="0.01"></label>
+        <label>Total de horas trabalhadas: <input type="number" id="horasTotais"></label>
+
+        <button class="calcular-btn" onclick="calcularHora()">Calcular</button>
+
+        <div id="resultado2" class="resultado"></div>
+        <canvas id="grafico2"></canvas>
+    </div>
+
+    <!-- CALCULADORA 3 -->
+    <button class="toggle-btn" onclick="toggleCalc('calc3')">📅 Calculadora de Média Semanal/Mensal</button>
+    <div id="calc3" class="calculadora">
+        <label>Lucro líquido total (R$): <input type="number" id="lucroTotal" step="0.01"></label>
+        <label>Total de dias trabalhados: <input type="number" id="diasTrabalhados"></label>
+
+        <button class="calcular-btn" onclick="calcularMedia()">Calcular</button>
+
+        <div id="resultado3" class="resultado"></div>
+        <canvas id="grafico3"></canvas>
+    </div>
+</div>
+
+<footer>© 2025 - Calculadoras LM Cell | Desenvolvido para motoristas de app</footer>
+
+<script>
+function toggleCalc(id) {
+    const el = document.getElementById(id);
+    el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+
+function formatar(valor) {
+    return 'R$ ' + valor.toFixed(2).replace('.', ',');
+}
+
+// Função de gráfico de barras simples
+function desenharGrafico(canvasId, dados, cores, labels) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    const largura = canvas.width = canvas.offsetWidth;
+    const altura = canvas.height = 200;
+    const max = Math.max(...dados, 1);
+    const barWidth = largura / (dados.length * 2);
+
+    ctx.clearRect(0, 0, largura, altura);
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+
+    dados.forEach((valor, i) => {
+        const barHeight = (valor / max) * (altura - 40);
+        const x = (i * barWidth * 2) + barWidth / 2;
+        const y = altura - barHeight - 20;
+
+        ctx.fillStyle = cores[i];
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        ctx.fillStyle = "#333";
+        ctx.fillText(labels[i], x + barWidth / 2, altura - 5);
+        ctx.fillText("R$" + valor.toFixed(2), x + barWidth / 2, y - 5);
+    });
+}
+
+// 1️⃣ Lucro Diário + Combustível
+function calcularLucro() {
+    const ganhos = parseFloat(document.getElementById('ganhosDia').value) || 0;
+    const km = parseFloat(document.getElementById('kmRodados').value) || 0;
+    const horas = parseFloat(document.getElementById('horasTrabalhadas').value) || 0;
+    const consumo = parseFloat(document.getElementById('consumoMedio').value) || 12.8;
+    const preco = parseFloat(document.getElementById('precoCombustivel').value) || 6;
+    const aluguel = parseFloat(document.getElementById('aluguelCarro').value) || 0;
+
+    const litrosGastos = km / consumo;
+    const gastoCombustivel = litrosGastos * preco;
+    const lucroLiquido = ganhos - gastoCombustivel - aluguel;
+    const ganhoKm = km > 0 ? ganhos / km : 0;
+    const ganhoHora = horas > 0 ? ganhos / horas : 0;
+
+    document.getElementById('resultado1').innerHTML = `
+        💰 <strong>Lucro líquido:</strong> ${formatar(lucroLiquido)}<br>
+        ⛽ <strong>Gasto com combustível:</strong> ${formatar(gastoCombustivel)}<br>
+        🧮 <strong>Litros gastos:</strong> ${litrosGastos.toFixed(2)} L<br>
+        📏 <strong>Ganho por km:</strong> ${formatar(ganhoKm)}<br>
+        ⏰ <strong>Ganho por hora:</strong> ${formatar(ganhoHora)}
+    `;
+
+    desenharGrafico("grafico1",
+        [lucroLiquido, gastoCombustivel, aluguel],
+        ["#6a0dad", "#009dff", "#8a2be2"],
+        ["Lucro", "Combustível", "Aluguel"]);
+}
+
+// 2️⃣ Média de Lucro por Hora
+function calcularHora() {
+    const ganhos = parseFloat(document.getElementById('ganhosTotais').value) || 0;
+    const horas = parseFloat(document.getElementById('horasTotais').value) || 0;
+
+    const ganhoHora = horas > 0 ? ganhos / horas : 0;
+    const ganhoMin = ganhoHora / 60;
+
+    document.getElementById('resultado2').innerHTML = `
+        ⏰ <strong>Ganho por hora:</strong> ${formatar(ganhoHora)}<br>
+        🕒 <strong>Ganho por minuto:</strong> ${formatar(ganhoMin)}
+    `;
+
+    desenharGrafico("grafico2",
+        [ganhoHora, ganhoMin * 60],
+        ["#009dff", "#6a0dad"],
+        ["Hora", "Minuto x60"]);
+}
+
+// 3️⃣ Média Semanal/Mensal
+function calcularMedia() {
+    const lucro = parseFloat(document.getElementById('lucroTotal').value) || 0;
+    const dias = parseFloat(document.getElementById('diasTrabalhados').value) || 0;
+
+    const mediaDia = dias > 0 ? lucro / dias : 0;
+    const mediaSemana = mediaDia * 7;
+    const mediaMes = mediaDia * 30;
+
+    document.getElementById('resultado3').innerHTML = `
+        📅 <strong>Média por dia:</strong> ${formatar(mediaDia)}<br>
+        📆 <strong>Média por semana:</strong> ${formatar(mediaSemana)}<br>
+        🗓️ <strong>Média por mês:</strong> ${formatar(mediaMes)}
+    `;
+
+    desenharGrafico("grafico3",
+        [mediaDia, mediaSemana, mediaMes],
+        ["#6a0dad", "#009dff", "#8a2be2"],
+        ["Dia", "Semana", "Mês"]);
+}
+</script>
+</body>
+</html>
